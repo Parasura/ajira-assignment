@@ -72,7 +72,7 @@ public class BattleOrderFinder {
                     enAvail[j] = false;
                     res.put(e, m);
                 }
-                if(res.size() >= 3) {
+                if(res.size() >= winsNeeded) {
                     return;
                 }
                 browsePlatoons(my, i + 1, ene, enAvail, res, winsNeeded);
