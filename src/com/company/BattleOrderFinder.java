@@ -68,13 +68,13 @@ public class BattleOrderFinder {
             return;
         }
 
-        Troop m = myTroops[index];
+        Troop myTroop = myTroops[index];
         for(int j =0;j < enemyTroops.length; j++) {
-            Troop e = enemyTroops[j];
+            Troop enemyTroop = enemyTroops[j];
             if(enemyAvail[j]) {
-                if(m.battle(e) == Outcome.WIN) {
+                if(myTroop.battle(enemyTroop) == Outcome.WIN) {
                     enemyAvail[j] = false;
-                    result.put(e, m);
+                    result.put(enemyTroop, myTroop);
                 }
                 if(result.size() >= winsNeeded) {
                     return;
