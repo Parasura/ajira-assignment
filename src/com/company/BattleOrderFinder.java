@@ -29,9 +29,11 @@ public class BattleOrderFinder {
 
         boolean[] enAvail = new boolean[myTroops.length];
         Arrays.fill(enAvail, true);
+
         Map<Troop, Troop> result = new LinkedHashMap<>();
-        StringBuilder ans = new StringBuilder();
+
         Set<Troop> myTroopsSet = new HashSet<>();
+
         for (Troop myTroop : myTroops) {
             myTroopsSet.add(myTroop);
         }
@@ -41,6 +43,8 @@ public class BattleOrderFinder {
         if(result.size() < winsNeeded) {
             return THERE_IS_NO_CHANCE_OF_WINNING;
         }
+
+        StringBuilder ans = new StringBuilder();
 
         for (Map.Entry<Troop, Troop> entry : result.entrySet()) {
             final Troop enemy = entry.getKey();
@@ -58,24 +62,24 @@ public class BattleOrderFinder {
         return ans.toString();
     }
 
-    private void browsePlatoons(Troop[] my, int i, Troop[] ene, boolean[] enAvail, Map<Troop, Troop> res, int winsNeeded) {
+    private void browsePlatoons(Troop[] myTroops, int index, Troop[] enemyTroops, boolean[] enemyAvail, Map<Troop, Troop> result, int winsNeeded) {
 
-        if (i >= my.length) {
+        if (index >= myTroops.length) {
             return;
         }
 
-        Troop m = my[i];
-        for(int j =0;j < ene.length; j++) {
-            Troop e = ene[j];
-            if(enAvail[j]) {
+        Troop m = myTroops[index];
+        for(int j =0;j < enemyTroops.length; j++) {
+            Troop e = enemyTroops[j];
+            if(enemyAvail[j]) {
                 if(m.battle(e) == Outcome.WIN) {
-                    enAvail[j] = false;
-                    res.put(e, m);
+                    enemyAvail[j] = false;
+                    result.put(e, m);
                 }
-                if(res.size() >= winsNeeded) {
+                if(result.size() >= winsNeeded) {
                     return;
                 }
-                browsePlatoons(my, i + 1, ene, enAvail, res, winsNeeded);
+                browsePlatoons(myTroops, index + 1, enemyTroops, enemyAvail, result, winsNeeded);
             }
         }
     }
