@@ -1,5 +1,8 @@
 package com.company;
 
+import com.company.exception.InvalidInputException;
+import com.company.units.LightCavalry;
+import com.company.units.Spearmen;
 import com.company.units.Troop;
 
 import java.util.ArrayList;
@@ -15,18 +18,11 @@ import java.util.Set;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InvalidInputException {
 
         Scanner scanner = new Scanner(System.in);
         String line1 = scanner.nextLine();
         String line2 = scanner.nextLine();
-
-      //  String line1 = "Spearmen#10;Militia#30;FootArcher#20;LightCavalry#1000;HeavyCavalry#120";
-       // String line2 = "Militia#10;Spearmen#10;FootArcher#1000;LightCavalry#120;CavalryArcher#100";
-
-        //Spearmen#10;Militia#30;FootArcher#20;LightCavalry#1000;HeavyCavalry#120
-        //Militia#100000;Spearmen#100000;FootArcher#10000000;LightCavalry#1200000;CavalryArcher#1000000
-        String[] myInput = line1.split(";");
 
         Troop[] myTroops = fillArray(line1);
         Troop[] enmeyTroops = fillArray(line2);
@@ -34,7 +30,6 @@ public class Main {
         BattleOrderFinder battleOrderFinder = new BattleOrderFinder(myTroops, enmeyTroops);
         System.out.println(battleOrderFinder.printBattleOrder());
     }
-
 
     private static Troop[] fillArray(String line) {
         String[] myInput = line.split(";");

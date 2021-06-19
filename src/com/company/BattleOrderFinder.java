@@ -1,5 +1,6 @@
 package com.company;
 
+import com.company.exception.InvalidInputException;
 import com.company.units.Troop;
 
 import java.util.Arrays;
@@ -14,7 +15,7 @@ import java.util.Set;
  */
 public class BattleOrderFinder {
 
-    private static final String THERE_IS_NO_CHANCE_OF_WINNING = "There is no chance of winning";
+    public static final String THERE_IS_NO_CHANCE_OF_WINNING = "There is no chance of winning";
     private Troop[] myTroops;
     private Troop[] enemyTroops;
     private int winsNeeded;
@@ -25,61 +26,78 @@ public class BattleOrderFinder {
         this.winsNeeded = myTroops.length / 2 + 1;
     }
 
-    public String printBattleOrder() {
+    public String printBattleOrder() throws InvalidInputException {
 
-        boolean[] enAvail = new boolean[myTroops.length];
-        Arrays.fill(enAvail, true);
+        validate();
 
-        Map<Troop, Troop> result = new LinkedHashMap<>();
+        boolean[] enemyTroopAvailablity = new boolean[myTroops.length];
+        Arrays.fill(enemyTroopAvailablity, true);
+        boolean[] myTroopAvailability = new boolean[myTroops.length];
+        Arrays.fill(myTroopAvailability, true);
 
+        Map<Troop, Troop> combination = new LinkedHashMap<>();
+
+        browsePlatoons(0, enemyTroopAvailablity, myTroopAvailability, combination);
+
+        if(combination.size() < winsNeeded) {
+            return THERE_IS_NO_CHANCE_OF_WINNING;
+        }
+
+        StringBuilder troopsBattleOrder = buildBattleOrder(combination);
+
+        return troopsBattleOrder.toString();
+    }
+
+    private void validate() throws InvalidInputException {
+        if(myTroops == null || enemyTroops == null || myTroops.length == 0 || enemyTroops.length == 0) {
+            throw new InvalidInputException();
+        }
+    }
+
+    private StringBuilder buildBattleOrder(Map<Troop, Troop> result) {
+
+        System.out.println(result);
         Set<Troop> myTroopsSet = new HashSet<>();
 
         for (Troop myTroop : myTroops) {
             myTroopsSet.add(myTroop);
         }
 
-        browsePlatoons(myTroops, 0, enemyTroops, enAvail, result, winsNeeded);
-
-        if(result.size() < winsNeeded) {
-            return THERE_IS_NO_CHANCE_OF_WINNING;
-        }
-
-        StringBuilder ans = new StringBuilder();
+        StringBuilder troopOrder = new StringBuilder();
 
         for (Map.Entry<Troop, Troop> entry : result.entrySet()) {
             final Troop enemy = entry.getKey();
             final Troop me = entry.getValue();
-            ans.append(me).append(";");
+            troopOrder.append(me).append(";");
             myTroopsSet.remove(me);
         }
 
         final Iterator<Troop> iterator = myTroopsSet.iterator();
 
         while (iterator.hasNext()) {
-            ans.append(iterator.next()).append(";");
+            troopOrder.append(iterator.next()).append(";");
         }
-
-        return ans.toString();
+        return troopOrder;
     }
 
-    private void browsePlatoons(Troop[] myTroops, int index, Troop[] enemyTroops, boolean[] enemyAvail, Map<Troop, Troop> result, int winsNeeded) {
+    private void browsePlatoons(int index, boolean[] enemyTroopAvailablity, boolean[] myTroopAvailability, Map<Troop, Troop> combination) {
 
         if (index >= myTroops.length) {
             return;
         }
 
         Troop myTroop = myTroops[index];
-        for(int j =0;j < enemyTroops.length; j++) {
+
+        for (int j = 0; j < enemyTroops.length; j++) {
             Troop enemyTroop = enemyTroops[j];
-            if(enemyAvail[j]) {
-                if(myTroop.battle(enemyTroop) == Outcome.WIN) {
-                    enemyAvail[j] = false;
-                    result.put(enemyTroop, myTroop);
+            // Taking the enemy troop which is free
+            if (enemyTroopAvailablity[j] && myTroopAvailability[index]) {
+                if (myTroop.battle(enemyTroop) == Outcome.WIN) {
+                    enemyTroopAvailablity[j] = false;
+                    myTroopAvailability[index] = false;
+                    combination.put(enemyTroop, myTroop);
                 }
-                if(result.size() >= winsNeeded) {
-                    return;
-                }
-                browsePlatoons(myTroops, index + 1, enemyTroops, enemyAvail, result, winsNeeded);
+                browsePlatoons(index + 1, enemyTroopAvailablity, myTroopAvailability, combination);
             }
         }
     }
