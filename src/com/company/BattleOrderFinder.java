@@ -56,7 +56,6 @@ public class BattleOrderFinder {
 
     private StringBuilder buildBattleOrder(Map<Troop, Troop> result) {
 
-        System.out.println(result);
         Set<Troop> myTroopsSet = new HashSet<>();
 
         for (Troop myTroop : myTroops) {
